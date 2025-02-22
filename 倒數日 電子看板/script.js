@@ -1,86 +1,117 @@
-let events = []; // 存活動列表
-let currentIndex = 0; // 當前顯示的活動索引
-
-// 更新時鐘
-function updateClock() {
+// 時鐘與日期更新
+function updateTime() {
     const now = new Date();
     const hours = String(now.getHours()).padStart(2, '0');
     const minutes = String(now.getMinutes()).padStart(2, '0');
     const seconds = String(now.getSeconds()).padStart(2, '0');
-    document.getElementById("clock").innerHTML = `⏰ ${hours}:${minutes}:${seconds}`;
+    document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+
+    // 民國日期轉換
+    const year = now.getFullYear() - 1911;
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    document.getElementById('date').textContent = `${year}/${month}/${day}`;
+
+    // 星期轉換
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    document.getElementById('weekday').textContent = `星期${weekdays[now.getDay()]}`;
 }
 
-// 更新日期
-function updateDate() {
-    const now = new Date();
-    const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-    document.getElementById("date").innerHTML = `📅 ${now.toLocaleDateString('zh-TW', options)}`;
-}
+setInterval(updateTime, 1000);
+updateTime();
 
-// 更新倒數計時
-function updateCountdown(event) {
-    const eventDate = new Date(event.date);
+// 倒數計時功能
+function updateCountdown(targetDate) {
     const now = new Date();
-    const diff = eventDate - now;
+    const timeLeft = targetDate - now;
 
-    if (diff <= 0) {
-        document.getElementById("countdown").innerHTML = `📢 <b>${event.name}</b> 已開始！`;
+    if (timeLeft <= 0) {
+        document.getElementById('countdown').textContent = '倒數結束';
         return;
     }
 
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
 
-    document.getElementById("countdown").innerHTML = 
-        `⏳ <b>${event.name}</b> 還有 <b>${days}</b> 天 <b>${hours}</b> 小時 <b>${minutes}</b> 分鐘 <b>${seconds}</b> 秒`;
+    document.getElementById('countdown').textContent = `${days}天 ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-// 載入活動清單
-function fetchEvents() {
-    fetch("events.txt")
-    .then(response => response.text())
-    .then(data => {
-        events = data.trim().split("\n").map(line => {
-            const [action, eventName, eventDate] = line.split(",");
-            return { action: action.trim(), name: eventName.trim(), date: eventDate.trim() };
-        }).filter(event => event.action === "SHOW"); // 只顯示SHOW的活動
+// 讀取活動並顯示倒數計時
+async function loadEvents() {
+    try {
+        const response = await fetch('events.txt');
+        if (!response.ok) throw new Error('無法讀取活動檔案');
 
-        if (events.length > 0) {
-            showNextEvent(); // 顯示第一個活動
-            setInterval(showNextEvent, 5000); // 每 5 秒切換活動
+        const eventText = await response.text();
+        const lines = eventText.split('\n');
+
+        const eventList = [];
+        lines.forEach(line => {
+            if (line.startsWith('SHOW:')) {
+                const eventDetails = line.substring(5).trim().split(';');
+                if (eventDetails.length === 2) {
+                    const eventName = eventDetails[0];
+                    const eventDate = new Date(eventDetails[1]);
+                    eventList.push({ eventName, eventDate });
+                }
+            }
+        });
+
+        const eventItemContainer = document.getElementById('event-item');
+        let currentEventIndex = 0;
+
+        // 顯示活動並更新倒數
+        function updateEvent() {
+            if (eventList.length > 0) {
+                const event = eventList[currentEventIndex];
+                eventItemContainer.textContent = event.eventName;
+                updateCountdown(event.eventDate);
+                currentEventIndex = (currentEventIndex + 1) % eventList.length;
+            }
         }
-    });
+
+        // 每 5 秒更新一次活動
+        setInterval(updateEvent, 5000);
+        updateEvent();  // 頁面加載時立即顯示第一個活動
+
+    } catch (error) {
+        console.error(error);
+        document.getElementById('event-item').textContent = '活動加載失敗';
+    }
 }
 
-// 顯示下一個活動
-function showNextEvent() {
-    if (events.length === 0) return;
-    updateCountdown(events[currentIndex]);
-    currentIndex = (currentIndex + 1) % events.length;
-}
+loadEvents();
 
-// 載入跑馬燈內容
-function fetchMarquee() {
-    fetch("marquee.txt")
-    .then(response => response.text())
-    .then(data => {
-        const marqueeContainer = document.querySelector(".marquee-container");
-        const lines = data.trim().split("\n");
-        const showLines = lines.filter(line => line.startsWith("SHOW:")).map(line => line.replace("SHOW:", "").trim());
-        if (showLines.length > 0) {
-            marqueeContainer.innerHTML = `<marquee width="480" direction="left" scrollamount="3">${showLines.join(' | ')}</marquee>`;
+// 載入跑馬燈的文字
+async function loadMarqueeText() {
+    try {
+        const response = await fetch('marquee.txt');
+        if (!response.ok) throw new Error('無法讀取跑馬燈檔案');
+
+        const marqueeText = await response.text();
+        const lines = marqueeText.split('\n');
+
+        let displayText = '';
+
+        lines.forEach(line => {
+            if (line.startsWith('SHOW:')) {
+                displayText += line.substring(5) + ' ';
+            }
+        });
+
+        const marqueeElement = document.querySelector('.footer marquee');
+        if (displayText.trim()) {
+            marqueeElement.textContent = displayText.trim();
+        } else {
+            marqueeElement.textContent = '跑馬燈內容加載失敗，請檢查檔案內容。';
         }
-    });
+
+    } catch (error) {
+        console.error(error);
+        document.querySelector('.footer marquee').textContent = '跑馬燈內容讀取失敗';
+    }
 }
 
-setInterval(updateClock, 1000);
-setTimeout(() => location.reload(), 60000); // 1 分鐘自動刷新
-
-window.onload = () => {
-    updateClock();
-    updateDate();
-    fetchEvents();
-    fetchMarquee();
-};
+loadMarqueeText();

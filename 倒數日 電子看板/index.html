@@ -3,27 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>倒數計時電子看板</title>
+    <title>倒數計時看板</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <!-- 左側時鐘與日期 -->
+        <div class="left-panel">
+            <div class="clock">
+                <span id="clock">00:00:00</span>
+                <div class="date">
+                    <span id="date">yyy/mm/dd</span>
+                    <span id="weekday">星期X</span>
+                </div>
+            </div>
+        </div>
 
-    <!-- 跑馬燈區域 -->
-    <div class="marquee-container">
-        <script src="script.js"></script>
+        <!-- 分隔線 -->
+        <div class="divider"></div>
+
+        <!-- 右側倒數計時與活動 -->
+        <div class="main-content">
+            <h1>倒數計時</h1>
+            <div id="countdown-timer">
+                <p id="countdown">00天 00:00:00</p>
+            </div>
+
+            <div class="events-container">
+                <h1>活動</h1>
+                <div id="event-item">
+                    <!-- 活動名稱會在這裡切換 -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 左側資訊區 -->
-    <div class="left-panel">
-        <div id="clock" class="clock">⏰ 載入中...</div>
-        <div id="date" class="date">📅 載入中...</div>
-    </div>
+    <script src="script.js"></script>
 
-    <!-- 右側主要倒數區 -->
-    <div class="right-panel">
-        <h1>📢 倒數計時看板</h1>
-        <div id="countdown">載入中...</div>
-    </div>
-
+    <!-- 跑馬燈 -->
+    <footer class="footer">
+        <marquee width="100%" direction="left" scrollamount="15" id="marquee-text">
+            <!-- 跑馬燈文字會由 JavaScript 填充 -->
+        </marquee>
+    </footer>
 </body>
 </html>
