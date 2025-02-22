@@ -1,0 +1,57 @@
+body {
+    background-color: yellow;
+    color: black;
+    font-family: Arial, sans-serif;
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    flex-direction: column;
+}
+
+/* 跑馬燈在頂部 */
+.marquee-container {
+    width: 100%;
+    text-align: center;
+    background-color: yellow; /* 跑馬燈背景 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999; /* 保證跑馬燈在最上層 */
+}
+
+/* 左側資訊區 */
+.left-panel {
+    width: 30%;
+    background-color: #f8cfa0; /* 淡橘 */
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 60px; /* 避免跑馬燈遮擋 */
+}
+
+.clock {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.date {
+    background-color: #c8e6c9; /* 淡綠 */
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1.5em;
+    width: 100%;
+    text-align: center;
+}
+
+/* 右側主要倒數區 */
+.right-panel {
+    width: 70%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    flex-direction: column;
+    margin-top: 60px; /* 避免跑馬燈遮擋 */
+}
