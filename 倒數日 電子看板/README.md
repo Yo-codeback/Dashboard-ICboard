@@ -3,7 +3,7 @@
 `We don't have any English version`
 ---
 
-## 本專案在2025/--/-- 發表第一個版本(V--.-- - Can Relase)
+## 本專案在2025/2/2 發表第一個Preview版本(倒數日V1.0 - PRE)
 本專案使用語言:Html JavaScript Css Txt<br>
 本專案無任何官方建立的範例網站<br>
 本專案程式皆由ChatGPT先行創作，再經由作者修改後上傳，非作者自行創做
@@ -19,4 +19,3 @@
 
 
 ***
-
