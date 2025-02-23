@@ -1,5 +1,6 @@
 # 更好的各類型公告電子看板 
-> Better Electronic Billboards for varios types of announcements
+> Better Electronic Billboards for varios types of announcements  <br>
+
 `本介紹文檔繁體中文 暫時無任何英文版的介紹文檔`</br>
 `We don't have any English version`
 
